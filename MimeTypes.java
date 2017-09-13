@@ -7,7 +7,7 @@ import java.util.Map;
 
 public class MimeTypes {
 
-	private static Map<String, String[]> mime_types;
+	private static Map<String, String> mime_types;
 
 	
 	public static void main(String[] args) {
@@ -15,7 +15,7 @@ public class MimeTypes {
 
 		try {
 			
-			mime_types = new HashMap<String, String[]>();
+			mime_types = new HashMap<String, String>();
 		    
             File mime_file = new File("src/conf/mime.types");
 
@@ -44,20 +44,18 @@ public class MimeTypes {
             			
             			extensions = extension_list.split(" ");
             			
-            			for (String part : extensions) {
+            			for (String extension : extensions) {
+            				mime_types.put(extension,mime);
             				//System.out.println(part);
             			    //do something interesting here
             			}
             		}
-            		else
-            		{
-            			mime = readLine;
-            		}
+            		
             		
             		//System.out.println("Contains mime "+mime);
             		//System.out.println("Contains file extension "+extensions);
             		
-            		mime_types.put(mime,extensions);
+            		
 
             	}
             }
@@ -67,20 +65,22 @@ public class MimeTypes {
             	System.out.println(key);
             }*/
             
-            for (Map.Entry<String, String[]> entry : mime_types.entrySet()) {
+            for (Map.Entry<String, String> entry : mime_types.entrySet()) {
                 String key = entry.getKey();
-                String[] values = entry.getValue();
+                String value = entry.getValue();
                 
-                //System.out.println("Key: "+key);
-                for (String extension : values) {
+                System.out.println("Key: "+key);
+                System.out.println("Value: "+value);
+                //for (String extension : values) {
     				//System.out.println(extension);
     			    //do something interesting here
-    			}
+    			//}
                 // ...
             }
             
             
-            String[] extension_value = mime_types.get("application/octet-stream");
+            String mime_type = mime_types.get("htm");
+            System.out.println(mime_type);
 
             //for (String extension : extension_value) {
 			//	System.out.println(extension);
