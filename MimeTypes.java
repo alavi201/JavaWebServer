@@ -1,3 +1,14 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package javawebserver;
+
+/**
+ *
+ * @author aungphyo
+ */
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -7,17 +18,21 @@ import java.util.Map;
 
 public class MimeTypes {
 
-	private static Map<String, String> mime_types;
+	private  Map<String, String> mime_types;
+        private String fname = "";
 
-	
-	public static void main(String[] args) {
+	//constructor
+        public MimeTypes(String filename) throws IOException{
+            this.fname = filename;
+        }
+	public void load() throws IOException {
 		// TODO Auto-generated method stub
 
 		try {
 			
 			mime_types = new HashMap<String, String>();
 		    
-            File mime_file = new File("src/conf/mime.types");
+            File mime_file = new File(fname);
 
             BufferedReader buffer = new BufferedReader(new FileReader(mime_file));
 
@@ -95,5 +110,18 @@ public class MimeTypes {
             e.printStackTrace();
         }
 	}
+        
+        public String lookup(String extension) throws IOException{
+             if(this.mime_types.containsKey(extension)){
+                 return this.mime_types.get(extension);
+             }else{
+                 return "text/text";
+             }
+        }
+        
+        public static void main(String[]args) throws IOException{
+            MimeTypes mt = new MimeTypes("src/conf/mime.types");
+            mt.load();
+        }
 
 }
