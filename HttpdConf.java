@@ -13,18 +13,30 @@ import java.util.*;
 import java.io.*;
 
 public class HttpdConf {
-    public static void main(String[] args) throws IOException {
+    
+       private String fname = "";
+       private static Map<String,String> lhm = null;
+       private static Map<String,String> lhmsa = null;
+       private static Map<String,String> lhms = null;
+       
+       //constructor
+       public HttpdConf(String filename) throws IOException{
+        this.fname = filename; 
+       }
+       
+       //load method 
+       public void load() throws IOException {
          BufferedReader bf = null;
         try {
-             bf = new BufferedReader(new FileReader("src/conf/httpd.conf"));
+             bf = new BufferedReader(new FileReader(fname));
         } catch (FileNotFoundException ex) {
              ex.getMessage();
         }
         String line;
         //create LinkedHashMap 
-        LinkedHashMap<String,String> lhm = new LinkedHashMap<String,String>();
-        LinkedHashMap<String,String> lhmsa = new LinkedHashMap<String,String>();
-        LinkedHashMap<String,String> lhms = new LinkedHashMap<String,String>();
+         lhm = new LinkedHashMap<String,String>();
+         lhmsa = new LinkedHashMap<String,String>();
+         lhms = new LinkedHashMap<String,String>();
            String sa_key = null;
            String sa_value = null;
            String s_key = null;
@@ -63,5 +75,10 @@ public class HttpdConf {
           
         
     }
-    
+       
+    public static void main(String[]args) throws IOException{
+           HttpdConf ht = new HttpdConf("src/conf/httpd.conf");
+           ht.load();
+    }
 }
+
