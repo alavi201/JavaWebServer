@@ -60,25 +60,41 @@ public class Htpassword extends ConfigurationReader {
 
     // The string is the key:value pair username:password
     String[] tokens = credentials.split( ":" );
-        if(tokens[0] == "jrob" && tokens[1] == "{SHA}W6ph5Mm5Pz8GgiULbPgzG37mj9g="){
-            return true;
-        }else{
-            return false;
-        }
-    //implemented
        
+    //TODO: implement 
+       return false;
   }
 
   private boolean verifyPassword( String username, String password ) {
     // encrypt the password, and compare it to the password stored
     // in the password file (keyed by username)
-    // TODO: implement this
-      if(username == "jrob" && password == "{SHA}W6ph5Mm5Pz8GgiULbPgzG37mj9g=" ){
-            return true;   
-      }else{
-            return false;  
-      } 
-      
+    // TODO: implemented 
+       String pw = encryptClearPassword(password);
+       String uname = "";
+       String pword = "";
+      try {
+          BufferedReader bf = new BufferedReader(new FileReader(this.fname));
+           try {
+               String passreader = bf.readLine();
+               String[] passtoken = passreader.split(":");
+               
+                   uname = passtoken[0];
+                   pword = passtoken[1].replace("{SHA}", "").trim();
+               
+             
+           } catch (IOException ex) {
+               Logger.getLogger(Htpassword.class.getName()).log(Level.SEVERE, null, ex);
+           }
+      } catch (FileNotFoundException ex) {
+          Logger.getLogger(Htpassword.class.getName()).log(Level.SEVERE, null, ex);
+      }
+         if(uname.equals(username) && pw.equals(pword)){
+             System.out.println("YES");
+             return true;
+         }else{
+             System.out.println("NO");
+             return false;
+         }
   }
 
   private String encryptClearPassword( String password ) {
@@ -89,7 +105,7 @@ public class Htpassword extends ConfigurationReader {
       MessageDigest mDigest = MessageDigest.getInstance( "SHA-1" );
       byte[] result = mDigest.digest( password.getBytes() );
 
-     return Base64.getEncoder().encodeToString( result );
+      return Base64.getEncoder().encodeToString( result );
     } catch( Exception e ) {
       return e.getMessage();
     }
@@ -104,21 +120,22 @@ public class Htpassword extends ConfigurationReader {
              while((str = bf.readLine()) != null){
                 // str = bf.readLine();
                  
-                 String[] s = str.split(" ",2);
+                 String[] s = str.split(":",2);
                  
                  String key = s[0];
                  String value = s[1];
-               //  if(key == "AuthName")
-               //      value = "I Challenge You";
                  
-                 hm.put(key, value);
+                     hm.put(key, value);
+                 if(s.length == 2){
+                     hm.put(s[0], s[1].replace("{SHA}", "").trim());
+                 }
              }
              
              Set keys = hm.keySet();
              for(Iterator i = keys.iterator(); i.hasNext();){
                  String key = (String) i.next();
                  String value = (String) hm.get(key);
-                 System.out.println(key + "=" + value);
+                 System.out.println(key + ":" + value);
              }
         } catch (FileNotFoundException ex) {
              ex.getMessage();
@@ -127,12 +144,14 @@ public class Htpassword extends ConfigurationReader {
   public static void main(String[]args){
       Htpassword htp = null; 
       try {   
-           htp = new Htpassword("./src/_.htaccess.txt");
+           htp = new Htpassword("./src/example.htpassword.txt");
            // htp.load();
            //System.out.println(htp.toString());     
       } catch (IOException ex) {
           Logger.getLogger(Htpassword.class.getName()).log(Level.SEVERE, null, ex);
       }
-      
+     // htp.verifyPassword("jrob", "helloworld");
+    // System.out.println(htp.encryptClearPassword("helloworld"));
+    //  htp.verifyPassword("jrob", "helloworld");
   }
 }
