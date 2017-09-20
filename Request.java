@@ -5,14 +5,15 @@ import java.net.*;
 
 public class Request {
 
-	private String uri = "";
-	private String request_method = "";
+	public String uri = "";
+	public String request_method = "";
 	private String http_version = "";
-	private Map<String, String> query_params;
-	private Map<String, String> request_headers;
-	private Map<String, String> config;
-	private Map<String, String> Alias;
-	private Map<String, String> ScriptAlias;
+	private String body = "";
+	public Map<String, String> query_params;
+	public Map<String, String> request_headers;
+	public Map<String, String> config;
+	public Map<String, String> Alias;
+	public Map<String, String> ScriptAlias;
 	
 	
 	public static void main(String[] args) {
@@ -20,7 +21,7 @@ public class Request {
 		String request_line = "";
 		File http_file = new File("src/http_request.txt");
 		
-		
+		ResponseFactory responseFactory = new ResponseFactory();
 		
 	/*try {	
 		ServerSocket socket = new ServerSocket(8080);
@@ -90,31 +91,43 @@ public class Request {
 			
 			//Print("Original uri "+ws.uri);
 			
-			if(ws.Alias.containsKey(ws.uri)) {
-	        	ws.uri = ws.Alias.get(ws.uri);
-	        	//Print("Aliasd "+ws.uri);
-	        }
-	        else if(ws.ScriptAlias.containsKey(ws.uri))
-	        	ws.uri = ws.ScriptAlias.get(ws.uri);
-	        else
-	        	ws.uri = ws.config.get("DocumentRoot") + ws.uri ;
+			Resource rsrc = new Resource(ws.uri, ws);
 	        
-	        if(ws.uri.lastIndexOf('.') == -1)
-	        	ws.uri = ws.uri + ws.config.get("DirectoryIndex");
-	        
-	        Print(ws.uri);
-	        
-	        
-	        File file = new File(ws.uri);
+			String absolpath = rsrc.absolutePath();
+			
+			Print(absolpath);
+			
+	        File file = new File(absolpath);
 	        if(!file.exists()) {
-	        	Print("404");
-	            // do something
+	        	 if(ws.request_method.equals("PUT"))
+	        	 {
+	        		Print("Create file");
+	        		try{
+	        		    PrintWriter writer = new PrintWriter(absolpath, "UTF-8");
+	        		    writer.println("The first line");
+	        		    writer.println("The second line");
+	        		    writer.close();
+	        		    Response response = responseFactory.getResponse("201");
+		        		//;
+	        		} catch (IOException e) {
+	        			Response response = responseFactory.getResponse("500");
+		        		//;
+	        		   // do something
+	        		} 
+		        		
+	        	}
+	        	else {
+	        		//Print("404");
+	        		Response response = responseFactory.getResponse("404");
+	        		//;
+	        	}
+	        	// do something
 	        }else {
 	        	String line = "";
 	        	
 	        	switch (ws.request_method){
 		        	case "GET":
-		        		BufferedReader reader = new BufferedReader(new FileReader(ws.uri));
+		        		BufferedReader reader = new BufferedReader(new FileReader(absolpath));
 			        	
 		        		//Print("Check last modified");
 		        		//Print("Output file contents");
@@ -125,7 +138,7 @@ public class Request {
 		        		break;
 		        	case "POST":
 		        		Print("200");
-		        		BufferedReader reader_post = new BufferedReader(new FileReader(ws.uri));
+		        		BufferedReader reader_post = new BufferedReader(new FileReader(absolpath));
 			        	
 			        	
 		        		//Print("Output file contents");
@@ -136,18 +149,33 @@ public class Request {
 		        		//Print("200");
 		        		break;
 		        	case "PUT":
-		        		Print("Create/Overwrite file");
-		        		Print("201");
+		        		try{
+		        			Print("Overwriting");
+		        		    PrintWriter writer = new PrintWriter(absolpath, "UTF-8");
+		        		    writer.println("The first line");
+		        		    writer.println("The second line");
+		        		    writer.println("The third line");
+		        		    writer.close();
+		        		    Response response = responseFactory.getResponse("201");
+			        		//;
+		        		} catch (IOException e) {
+		        			Response response = responseFactory.getResponse("500");
+			        		//;
+		        		   // do something
+		        		} 
 		        		break;
 		        	case "DELETE":
 		        		Print("Delete File");
 		        		if(file.delete()){
 		        			System.out.println(file.getName() + " is deleted!");
+		        			Response response = responseFactory.getResponse("204");
+			        		//;
 		        		}else{
 		        			System.out.println("Delete operation is failed.");
+		        			Response response = responseFactory.getResponse("500");
+			        		//;
 		        		}
 
-		        		Print("204");
 		        		break;
 		        		
 		        }
@@ -237,9 +265,17 @@ public class Request {
 		
 	}
 
-	protected static String readRequest( Socket client, Request req ) throws IOException {
+	protected void readRequest( Socket client, Request req ) throws IOException {
 	    String readLine;
 	    String response = "200";
+	    
+	    req.request_headers = new HashMap<String, String>();
+	    req.query_params = new HashMap<String, String>();
+	    req.config =  new HashMap<String, String>();
+	    req.Alias =  new HashMap<String, String>();
+	    req.ScriptAlias =  new HashMap<String, String>();
+		
+		readHttpdConf(req);
 	    
 	    BufferedReader buffer = new BufferedReader(
 	      new InputStreamReader( client.getInputStream() )
@@ -251,36 +287,18 @@ public class Request {
 
 	    if(valid_request == 1)
 	    {
-		    while ((readLine = buffer.readLine()) != null) {
-		    	
-		    	System.out.println(readLine);
+			req.request_headers = ParseRequestHeaders(buffer, req.request_headers);
 				
-				if("".equals(readLine))
-					break;
-					//System.out.println("Done headers");
-				//else
-				//{
-				if(!readLine.contains(": ")){
-					response = "400";
-					break;
-				}
-				
-				String header_parts[] = readLine.split(": ");
-					
-					
-					String key = header_parts[0];
-					String value = header_parts[1];
-					System.out.println("Key "+key+", Value "+value);
-				
-		    }
 	    }
-	    else
-	    	response = "400";
-	    	
-	    return response;
+	    
+	    if (req.request_headers.get("Content-Length") != null) {
+			req.body = buffer.readLine();
+			//System.out.println("Body "+body);
+		}
+	    
 	}
 
-	protected static void sendResponse( Socket client, String response ) throws IOException {
+	protected void sendResponse( Socket client, String response ) throws IOException {
 	    PrintWriter out = new PrintWriter( client.getOutputStream(), true );
 	    //int gift = (int) Math.ceil( Math.random() * 100 );
 	    //String response = "404 Gee, thanks, this is for you: " + gift;
@@ -340,4 +358,5 @@ public class Request {
 		System.out.println(string);
 	}
 
+		
 }
