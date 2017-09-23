@@ -1,7 +1,8 @@
 
 public class FiveHundred extends Response{
 
-	FiveHundred(){
+	FiveHundred(Resource resource){
+		super(resource);
 		this.code = 500;
 		this.reasonPhrase = "InternalServerError";
 	}

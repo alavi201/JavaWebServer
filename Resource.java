@@ -5,47 +5,57 @@ public class Resource {
 
 	private String absolutepath = "";
 	boolean script = false;
+	public String output = "";
 	
 	Resource(String uri, Request ws ){
 		
 		int first = uri.indexOf("/");
 		int second = uri.indexOf("/", first + 1);
 		String resource_name = "";
+		String aboslute_path = "";
 		
 		//System.out.println(second);
 		
 		String checkAlias = "";
 		resource_name = uri.substring(uri.lastIndexOf("/") + 1);
 		
-		System.out.println(resource_name);
+		System.out.println("Resource Name"+resource_name);
 		
 		if(second != -1)
 		{
 			checkAlias = uri.substring(first, second +1);
 		}
 		
-		//System.out.println(checkAlias);
+		System.out.println(checkAlias);
 		
 		if(ws.Alias.containsKey(checkAlias)) {
-        	this.absolutepath = ws.Alias.get(checkAlias);
+			aboslute_path = ws.Alias.get(checkAlias);
+        	//checkAlias = "";
         	//Print("Aliasd "+ws.uri);
         }
         else if(ws.ScriptAlias.containsKey(checkAlias))
         {
         	this.script = true;
-        	this.absolutepath = ws.ScriptAlias.get(checkAlias);
+        	aboslute_path = ws.ScriptAlias.get(checkAlias);
+        	
         }
         else
-        	this.absolutepath = ws.config.get("DocumentRoot");
+        	aboslute_path = ws.config.get("DocumentRoot") + checkAlias;
 		
-		this.absolutepath = this.absolutepath + resource_name;
+		aboslute_path = aboslute_path + resource_name;
+		
+		//System.out.println("Absoulte path "+this.absolutepath);
 		
 		//if()
+		File file = new File(aboslute_path);
+		
         
-        if(absolutepath.lastIndexOf('.') == -1)
-        	this.absolutepath = this.absolutepath + ws.config.get("DirectoryIndex");
+        if(!file.isFile())
+        	aboslute_path = aboslute_path + ws.config.get("DirectoryIndex");
         
-        //System.out.println(this.absolutepath);
+        this.absolutepath = aboslute_path.replace("//","/");
+        
+        System.out.println(this.absolutepath);
         
         //Print(ws.uri);
 	}

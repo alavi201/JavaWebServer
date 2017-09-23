@@ -1,6 +1,7 @@
 import java.io.*;
 import java.net.Socket;
 import java.util.*;
+import java.text.*;
 
 public abstract class Response {
 
@@ -8,9 +9,20 @@ public abstract class Response {
 	public String reasonPhrase = "";
 	Resource resource;
 	
-	/*Response(Resource resource){
+	protected String defaultHeaders() {
+		String headers = "";
+		
+		String timeStamp = new SimpleDateFormat("EEE, MMM d, yyyy hh:mm:ss a z").format(new Date());
+		
+		headers = headers+"Server: Alavi/1.0\r\n";
+		headers = headers+"Date: "+timeStamp+"\r\n";
+		
+		return headers;
+	}
+	
+	public Response(Resource resource){
 		this.resource = resource;
-	}*/
+	}
 	
 	protected void send( Socket client) throws IOException {
 		String response = "";
