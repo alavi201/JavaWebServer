@@ -2,6 +2,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.text.SimpleDateFormat;
 import java.io.File;
 import java.io.FileInputStream;
 
@@ -14,7 +15,7 @@ public class TwoHundred extends Response{
 		this.code = 200;
 		this.reasonPhrase = "OK";
 		
-		setLength("50");
+		//setLength("50");
 	}
 	
 	public void send(Socket client) throws IOException{
@@ -33,23 +34,39 @@ public class TwoHundred extends Response{
 	    	
 	    	File file = new File("D:/Users/Ali/workspace/server/public_html/output.html");
 	    	
-	    	socketOutputStream.write(("HTTP/1.1 "+response+"\r\nContent-Length: 3020\r\n"+this.resource.output).getBytes());
+	    	socketOutputStream.write(("HTTP/1.1 "+response+"\r\n"+this.resource.output).getBytes());
 	    }else {
 		    File file = new File(this.resource.absolutePath());
-			FileInputStream fin = null;
 			
-			fin = new FileInputStream(file);
-	
-			byte fileContent[] = new byte[(int)file.length()];
+		    SimpleDateFormat sdf = new SimpleDateFormat("EEE, MMM d, yyyy hh:mm:ss a z");
+
+    		//System.out.println("After Format : " + sdf.format(file.lastModified()));
+    		//this.responseHeaders.put("Last-Modified", sdf.format(file.lastModified()));
+			this.responseHeaders.put("Content-Type", "text/HTML");
 			
-			// Reads up to certain bytes of data from this input stream into an array of bytes.
-			fin.read(fileContent);
-			//create string from byte array
-			String s = new String(fileContent);
-			//System.out.println("File content: " + s);
+			this.responseHeaders.put("Content-Length", Long.toString(file.length()) );
 			
-			socketOutputStream.write(("HTTP/1.1 "+response+"\r\n"+defaultHeaders()+"Content-Length: "+(int)file.length()+"\r\nContent-Type: text/HTML\r\nConnection: close\r\n\r\n").getBytes());
-		    socketOutputStream.write(fileContent);
+			System.out.println(getResponseline());
+			
+			socketOutputStream.write((getResponseline() + getHeaders()+"\r\n").getBytes());
+		    
+			if(this.hasBody)
+			{
+				FileInputStream fin = null;
+				
+				fin = new FileInputStream(file);
+		
+				byte fileContent[] = new byte[(int)file.length()];
+				
+				// Reads up to certain bytes of data from this input stream into an array of bytes.
+				fin.read(fileContent);
+				//create string from byte array
+				String s = new String(fileContent);
+				
+				System.out.println(file.length());
+
+				socketOutputStream.write(fileContent);
+			}
 		    //out.println("HTTP/1.1 200 OK\\r\\nCache-Control: no-cache, private\\r\\nContent-Length: 107\\r\\nDate: Mon, 24 Nov 2014 10:21:21 GMT\\r\\n\\r\\n");
 	    }
 	}

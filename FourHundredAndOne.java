@@ -1,7 +1,8 @@
 
 public class FourHundredAndOne extends Response{
 
-	FourHundredAndOne(){
+	FourHundredAndOne(Resource resource){
+		super(resource);
 		this.code = 401;
 		this.reasonPhrase = "File created";
 	}
