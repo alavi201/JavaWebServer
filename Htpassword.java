@@ -18,6 +18,7 @@ import java.nio.charset.Charset;
 import java.security.MessageDigest;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -32,7 +33,7 @@ public class Htpassword extends ConfigurationReader {
   //new variable
       private String fname = "";
       private static BufferedReader bf = null;
-      Map<String, String> hm = null;
+     
 
   public Htpassword( String filename ) throws IOException {
     super( filename );
@@ -54,15 +55,21 @@ public class Htpassword extends ConfigurationReader {
     // authInfo is provided in the header received from the client
     // as a Base64 encoded string.
     String credentials = new String(
-      Base64.getDecoder().decode( authInfo ),
-      Charset.forName( "UTF-8" )
-    );
+      Base64.getDecoder().decode(authInfo),
+      Charset.forName("UTF-8")
 
+    );
+    // System.out.println(credentials);
     // The string is the key:value pair username:password
     String[] tokens = credentials.split( ":" );
-       
-    //TODO: implement 
-       return false;
+     
+    if((verifyPassword(tokens[0],tokens[1])) == true){
+          return true;
+    }else{      
+          return false; 
+    }   
+    // implemented  
+    
   }
 
   private boolean verifyPassword( String username, String password ) {
@@ -89,10 +96,10 @@ public class Htpassword extends ConfigurationReader {
           Logger.getLogger(Htpassword.class.getName()).log(Level.SEVERE, null, ex);
       }
          if(uname.equals(username) && pw.equals(pword)){
-             System.out.println("YES");
+           //  System.out.println("YES");
              return true;
          }else{
-             System.out.println("NO");
+           //  System.out.println("NO");
              return false;
          }
   }
@@ -111,16 +118,20 @@ public class Htpassword extends ConfigurationReader {
     }
   }
   
-  
+  public String encodeuserpass(String username,String password){
+      String encode = username + ":" + password;
+       return Base64.getEncoder().encodeToString(encode.getBytes());
+      
+  }
   public void load() throws IOException{
        String str = "";
-          hm = new HashMap<String,String>();
+        
           try {
              bf = new BufferedReader(new FileReader(fname));
              while((str = bf.readLine()) != null){
                 // str = bf.readLine();
                  
-                 String[] s = str.split(":",2);
+             /*    String[] s = str.split(":",2);
                  
                  String key = s[0];
                  String value = s[1];
@@ -128,13 +139,15 @@ public class Htpassword extends ConfigurationReader {
                      hm.put(key, value);
                  if(s.length == 2){
                      hm.put(s[0], s[1].replace("{SHA}", "").trim());
-                 }
+                 }  */
+                 
+                 this.parseLine(str);
              }
              
-             Set keys = hm.keySet();
+             Set keys = passwords.keySet();
              for(Iterator i = keys.iterator(); i.hasNext();){
                  String key = (String) i.next();
-                 String value = (String) hm.get(key);
+                 String value = (String) passwords.get(key);
                  System.out.println(key + ":" + value);
              }
         } catch (FileNotFoundException ex) {
@@ -150,8 +163,9 @@ public class Htpassword extends ConfigurationReader {
       } catch (IOException ex) {
           Logger.getLogger(Htpassword.class.getName()).log(Level.SEVERE, null, ex);
       }
-     // htp.verifyPassword("jrob", "helloworld");
-    // System.out.println(htp.encryptClearPassword("helloworld"));
-    //  htp.verifyPassword("jrob", "helloworld");
+      // htp.verifyPassword("jrob", "helloworld");
+      //System.out.println(htp.encryptClearPassword("jrob:helloworld"));
+    //  System.out.println(htp.isAuthorized(htp.encodeuserpass("jrob", "helloworld")));
+     // System.out.println(htp.isAuthorized("at+xg6SiyUovktq1redipHiJpaE=".toString()));
   }
 }
