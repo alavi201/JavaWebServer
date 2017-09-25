@@ -1,14 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-package javawebserver;
-
-/**
- *
- * @author aungphyo
- */
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -16,112 +5,75 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MimeTypes {
+public class MimeTypes extends ConfigurationReader {
 
-	private  Map<String, String> mime_types;
-        private String fname = "";
+	private static Map<String, String> types;
 
-	//constructor
-        public MimeTypes(String filename) throws IOException{
-            this.fname = filename;
-        }
-	public void load() throws IOException {
-		// TODO Auto-generated method stub
+	MimeTypes(String filename){
+		super(filename);
+		types = new HashMap<String, String>();
+		this.load();
+	}
+	
+	public void load() {
 
-		try {
+		try {			
 			
-			mime_types = new HashMap<String, String>();
-		    
-            File mime_file = new File(fname);
-
-            BufferedReader buffer = new BufferedReader(new FileReader(mime_file));
-
-            String readLine = "";
-
-            //System.out.println("Reading file using Buffered Reader");
-
-            while ((readLine = buffer.readLine()) != null) {
-            	if(! readLine.isEmpty() && readLine.charAt(0)!= '#' )
-            	{
-            		//System.out.println(readLine);
-            		
+            while (this.hasMoreLines()) {
+          	
+            	String Line = this.nextLine();
+            	
+            	//System.out.println(Line);
+            	
+            	if(! Line.isEmpty() && Line.charAt(0)!= '#' )
+            	{	
             		String extension_list = "";
             		String mime = "";
             		
             		String[] extensions = new String[0];
             		
-            		if(readLine.contains("\t"))
+            		if(Line.contains("\t"))
             		{
-            			mime = readLine.substring(0,readLine.indexOf("\t"));
+            			mime = Line.substring(0,Line.indexOf("\t"));
             			
-            			extension_list = readLine.substring(readLine.indexOf("\t"), readLine.length());
+            			//System.out.println("Contains mime "+mime);
+                		
+            			extension_list = Line.substring(Line.indexOf("\t"), Line.length());
             			extension_list = extension_list.replace("\t", "");
-            			
             			extensions = extension_list.split(" ");
             			
             			for (String extension : extensions) {
-            				mime_types.put(extension,mime);
-            				//System.out.println(part);
-            			    //do something interesting here
+            				//System.out.println("Contains file extension "+extension);
+                			
+            				 this.types.put(extension,mime);
             			}
             		}
             		
-            		
-            		//System.out.println("Contains mime "+mime);
-            		//System.out.println("Contains file extension "+extensions);
-            		
-            		
-
             	}
             }
-            
-            /*for (String key : mimes.keySet()) {
-                // ...
-            	System.out.println(key);
-            }*/
-            
-            for (Map.Entry<String, String> entry : mime_types.entrySet()) {
-                String key = entry.getKey();
-                String value = entry.getValue();
-                
-                System.out.println("Key: "+key);
-                System.out.println("Value: "+value);
-                //for (String extension : values) {
-    				//System.out.println(extension);
-    			    //do something interesting here
-    			//}
-                // ...
-            }
-            
-            
-            String mime_type = mime_types.get("htm");
-            System.out.println(mime_type);
-
-            //for (String extension : extension_value) {
-			//	System.out.println(extension);
-			    //do something interesting here
-			//}
-            
-            //if(mime_types.containsValue("htm"))
-            	//System.out.println("exists");
-            
-
+           
         } catch (IOException e) {
             e.printStackTrace();
         }
 	}
-        
-        public String lookup(String extension) throws IOException{
-             if(this.mime_types.containsKey(extension)){
-                 return this.mime_types.get(extension);
-             }else{
-                 return "text/text";
-             }
-        }
-        
-        public static void main(String[]args) throws IOException{
-            MimeTypes mt = new MimeTypes("src/conf/mime.types");
-            mt.load();
-        }
 
+	
+	public String lookup(String extension) throws IOException{
+        if(this.types.containsKey(extension)){
+            return this.types.get(extension);
+        }else{
+            return "text/text";
+        }
+   }
+	
+	public static void main(String[] args) throws IOException {
+	
+		MimeTypes mimes = new MimeTypes("src/conf/mime.types");
+		
+		for( String key : mimes.types.keySet()){
+            System.out.println(key + ": " + mimes.types.get(key));
+        }
+		
+	}
+	
 }

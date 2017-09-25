@@ -8,34 +8,41 @@ public abstract class Response {
 	public int code = 0;
 	public String reasonPhrase = "";
 	Resource resource;
+	public Map<String, String> responseHeaders;
+	boolean hasBody = true;
 	
-	protected String defaultHeaders() {
+	protected String getHeaders() {
 		String headers = "";
 		
-		String timeStamp = new SimpleDateFormat("EEE, MMM d, yyyy hh:mm:ss a z").format(new Date());
-		
-		headers = headers+"Server: Alavi/1.0\r\n";
-		headers = headers+"Date: "+timeStamp+"\r\n";
+		for (Map.Entry<String, String> header : this.responseHeaders.entrySet()) {
+			headers += header.getKey()+": "+header.getValue()+"\r\n";
+			//System.out.println(header.getKey()+": "+header.getValue()+"\r\n");
+		}
 		
 		return headers;
 	}
 	
+	protected String getResponseline() {
+		String responseLine = "";
+		
+		responseLine += "HTTP/1.1 "+this.code+" "+this.reasonPhrase+"\r\n";
+		
+		return responseLine;
+	}
+	
 	public Response(Resource resource){
+		this.responseHeaders = new HashMap<String, String>();
 		this.resource = resource;
+		String timeStamp = new SimpleDateFormat("EEE, MMM d, yyyy hh:mm:ss a z").format(new Date());
+		
+		this.responseHeaders.put("Server", "Alavi");
+		this.responseHeaders.put("Date", timeStamp);
+		this.responseHeaders.put("Connection", "Closed");
 	}
 	
 	protected void send( Socket client) throws IOException {
-		String response = "";
-	    PrintWriter out = new PrintWriter( client.getOutputStream(), true );
-	    //int gift = (int) Math.ceil( Math.random() * 100 );
-	    //String response = "404 Gee, thanks, this is for you: " + gift;
-	    
-	    response = this.code+" "+this.reasonPhrase+"\n";
-	    		
-
-	    out.println( response );
-
-	    System.out.println( "I sent: " + response );
+		OutputStream socketOutputStream = client.getOutputStream();
+		socketOutputStream.write((getResponseline() + getHeaders()+"\r\n").getBytes());
 	  }
 		
 }

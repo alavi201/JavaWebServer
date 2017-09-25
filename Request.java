@@ -9,7 +9,9 @@ public class Request {
 	public String request_method = "";
 	private String http_version = "";
 	public String body = "";
+	public byte[] body_byte_array;
 	public String query_params;
+	public String requestLine = "";
 	public Map<String, String> request_headers;
 	public Map<String, String> config;
 	public Map<String, String> Alias;
@@ -29,6 +31,8 @@ public class Request {
 	        	return_value = 0;
 	        
 	        System.out.println(request_line);
+	        
+	        ws.requestLine = request_line;
 	        
 	        String request_parts[] = request_line.split(" ");
 	        
@@ -69,12 +73,26 @@ public class Request {
 				{
 					break;
 				}
-					//System.out.println("Done headers");
+				
+				String value = "";
+				String key = "";
+				//System.out.println("Done headers");
 				//else
 				//{
 				String header_parts[] = readLine.split(": ");
-				String key = header_parts[0];
-				String value = header_parts[1];
+				key = header_parts[0].toLowerCase();
+				
+				//System.out.println(key);
+				//System.out.println(header_parts[1]);
+				
+				if(key.equals("authorization")) {
+					//System.out.println(header_parts[1]);
+					String value_parts[] = header_parts[1].split(" ");
+					value = value_parts[1];
+					//System.out.println(value);
+				}
+				else
+					value = header_parts[1];
 				request_headers.put(key, value);
 				//}
 			}
@@ -121,27 +139,20 @@ public class Request {
 	    	
 	    	System.out.println(sizebytes);
 	    	
-	    	byte[] data = new byte[sizebytes];
+	    	this.body_byte_array = new byte[sizebytes];
 	    	
 	    	String bodyline = "";
 	    	
-	    	int bytes_read = inputstream.read(data, 0, sizebytes);
+	    	int bytes_read = inputstream.read(this.body_byte_array, 0, sizebytes);
 	    	
 	    	if(bytes_read < 0) {
                 System.out.println("Server: Tried to read from socket, read() returned < 0,  Closing socket.");
                 return;
             }
 	    	
-	    	System.out.println("Body is "+ new String(data, 0, bytes_read));
+	    	//System.out.println("Body is "+ new String(this.body_byte_array, 0, bytes_read));
 	    	
-	    	req.body = new String(data, 0, bytes_read);
-	    	//inputstream.read(data);
-			
-	    	/*if((bodyline = buffer.readLine()) != null) {
-				System.out.println(bodyline);
-				req.body = bodyline;
-			}*/
-			//System.out.println("Body "+body);
+	    	req.body = new String(this.body_byte_array, 0, bytes_read);
 		}
 	    
 	}

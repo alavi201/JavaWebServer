@@ -3,7 +3,6 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package javawebserver;
 
 /**
  *
@@ -18,32 +17,35 @@ public class ConfigurationReader{
       static String fname = "";
       private static BufferedReader bf = null;
       Map<String, String> hm = null;
+      String currentLine = "";
       
      
       public ConfigurationReader(String fileName){
-           fname = fileName;
+           this.fname = fileName;
+           try {
+               bf = new BufferedReader(new FileReader(fname));
+           }catch (FileNotFoundException ex) {
+               ex.getMessage();
+           }
+           
           // hm = new HashMap<String,String>();
       }
       
-      public boolean hasMoreLine() throws IOException{
-           boolean line = false;
-           if(bf.readLine() != null){
-               line = true;
+      public boolean hasMoreLines() throws IOException{
+           
+    	  this.currentLine = this.bf.readLine();
+    	  
+    	  if(this.currentLine != null){
+               return true;
            }
            else{
-               line = false;
+               return false;
            }
-           return line; 
       }
       
       public String nextLine() throws IOException{
-           String s = "";
-        
-           while(bf.readLine() != null){
-               s = bf.readLine();
-           }
-           
-           return s;
+    	  //this.currentLine = this.bf.readLine();
+          return  this.currentLine;
       }
       
       public void load() throws IOException{

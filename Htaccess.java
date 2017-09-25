@@ -3,7 +3,6 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package javawebserver;
 
 /**
  *
@@ -24,38 +23,40 @@ public class Htaccess extends ConfigurationReader {
 
     private String fname = "";
     private static BufferedReader bf = null;
-    Map<String, String> hm = null;
+    Map<String, String> config = null;
 
     public Htaccess(String filename) throws IOException {
         super(filename);
         this.fname = filename;
+        this.config = new HashMap<String, String>();
+        this.load();
     }
 
     public void load() throws IOException {
-        String str = "";
-        hm = new HashMap<String, String>();
-        try {
-            bf = new BufferedReader(new FileReader(fname));
-            while ((str = bf.readLine()) != null) {
-                // str = bf.readLine();
-
-                String[] s = str.split(" ", 2);
-
-                String key = s[0];
-                String value = s[1];
-               //  if(key == "AuthName")
-                //      value = "I Challenge You";
-
-                hm.put(key, value);
-            }
-
-            Set keys = hm.keySet();
-            for (Iterator i = keys.iterator(); i.hasNext();) {
-                String key = (String) i.next();
-                String value = (String) hm.get(key);
-                System.out.println(key + "=" + value);
-
-            }
+        
+    	try {						
+			while (this.hasMoreLines()) {
+	          	
+            	String Line = this.nextLine();
+            	
+            	//System.out.println(Line);
+            	
+            	if(! Line.isEmpty() && Line.charAt(0)!= '#' ){	
+            		String key = "";
+            		String value = "";
+            	
+            		 String[] str = Line.split(" ");
+                     
+            		 key = str[0];
+                     value = str[1];
+                     
+                     if(key.equals("AuthName")) {
+                    	 value = Line.substring(key.length()+1);
+                     }
+                     
+                     this.config.put(key, value.replace("\"", ""));
+            	}
+			}
         } catch (FileNotFoundException ex) {
             ex.getMessage();
         }
@@ -106,9 +107,11 @@ public class Htaccess extends ConfigurationReader {
     }
 
     public static void main(String[] args) throws IOException {
-        Htaccess ht = new Htaccess("src/_.htaccess.txt");
-        ht.load();
+        Htaccess ht = new Htaccess("src/conf/_.htaccess");
 
-         System.out.println(ht.isAuthorized("jrob", "helloworld"));
+
+        for( String key : ht.config.keySet()){
+            System.out.println(key + ": " + ht.config.get(key));
+        }
     }
 }

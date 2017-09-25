@@ -3,7 +3,6 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package javawebserver;
 
 /**
  *
@@ -12,73 +11,98 @@ package javawebserver;
 import java.util.*;
 import java.io.*;
 
-public class HttpdConf {
+public class HttpdConf extends ConfigurationReader {
     
-       private String fname = "";
-       private static Map<String,String> lhm = null;
-       private static Map<String,String> lhmsa = null;
-       private static Map<String,String> lhms = null;
-       
-       //constructor
-       public HttpdConf(String filename) throws IOException{
-        this.fname = filename; 
-       }
-       
-       //load method 
-       public void load() throws IOException {
-         BufferedReader bf = null;
-        try {
-             bf = new BufferedReader(new FileReader(fname));
-        } catch (FileNotFoundException ex) {
-             ex.getMessage();
-        }
-        String line;
-        //create LinkedHashMap 
-         lhm = new LinkedHashMap<String,String>();
-         lhmsa = new LinkedHashMap<String,String>();
-         lhms = new LinkedHashMap<String,String>();
-           String sa_key = null;
-           String sa_value = null;
-           String s_key = null;
-           String s_value = null;
-           while((line=bf.readLine()) != null){
-                String[] str = line.split(" ");
-               
-                    String key = str[0];
-                    String value = str[1];
-                 
-                    if(key.equals("ScriptAlias")){
-                      
-                         sa_key = str[1];
-                         sa_value = str[2];
-                         lhmsa.put(sa_key, sa_value);
-                         
-                    }else if(key.equals("Alias")){
-                         s_key = str[1];
-                         s_value = str[2];
-                        lhms.put(s_key, s_value);
-                    }else{
-                        lhm.put(key, value);
-                    }
-               
-           }
-           for( String key : lhm.keySet()){
-               System.out.println(key + ": " + lhm.get(key));
-           }
-           for(String key : lhmsa.keySet()){
-               System.out.println("ScriptALias "+key + ": " + lhmsa.get(key));
-           }
-           for(String key : lhms.keySet()){
-               System.out.println(" "+key + ": " + lhms.get(key));
-           }
-           bf.close();
-          
-        
-    }
-       
-    public static void main(String[]args) throws IOException{
-           HttpdConf ht = new HttpdConf("src/conf/httpd.conf");
-           ht.load();
-    }
-}
+	private static Map<String, String> config;
+	private static Map<String, String> aliases;
+	private static Map<String, String> scriptaliases;
+	
+	HttpdConf (String filename){
+		super(filename);
+		config = new HashMap<String, String>();
+		aliases = new HashMap<String, String>();
+		scriptaliases = new HashMap<String, String>();
+		this.load();
+	}
+	
+	public Map getConfig() {
+		return this.config;
+	}
+	
+	public Map getAliases() {
+		return this.aliases;
+	}
+	
+	public Map getScriptAliases() {
+		return this.scriptaliases;
+	}
+	
+	public void load() {
 
+		try {			
+			
+			while (this.hasMoreLines()) {
+	          	
+            	String Line = this.nextLine();
+            	
+            	//System.out.println(Line);
+            	
+            	if(! Line.isEmpty() && Line.charAt(0)!= '#' ){	
+            		
+            		String key = "";
+            		String value = "";
+            	
+            		 String[] str = Line.split(" ");
+                     
+            		 key = str[0];
+                     value = str[1];
+                  
+                     if(key.equals("ScriptAlias")){
+                       
+                          key = str[1];
+                          value = str[2];
+                          this.scriptaliases.put(key, value.replace("\"", ""));
+                          
+                     }else if(key.equals("Alias")){
+                    	 key = str[1];
+                         value = str[2];
+                         this.aliases.put(key, value.replace("\"", ""));
+                     }else{
+                    	 this.config.put(key, value.replace("\"", ""));
+                     }
+         	   }
+                
+            }
+			
+			if(this.config.get("Listen") == null) {
+				this.config.put("Listen", "8080");
+			}
+			
+			if(this.config.get("AccessFileName") == null) { 
+				this.config.put("AccessFileName",".htaccess");
+			}
+			
+			if(this.config.get("DirectoryIndex") == null) { 
+				this.config.put("DirectoryIndex","index.html");
+			}
+			
+			if(this.config.get("LogFile") == null) { 
+				this.config.put("LogFile","logs/log.txt");
+			}
+			
+			
+			
+		}catch(IOException e) {
+            e.printStackTrace();
+		}
+	}
+	
+	
+	public static void main(String[] args) throws IOException {
+		HttpdConf httpd = new HttpdConf("src/conf/httpd.conf");
+		
+		for( String key : httpd.config.keySet()){
+            System.out.println(key + ": " + httpd.config.get(key));
+        }
+	}
+}
