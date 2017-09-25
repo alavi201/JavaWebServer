@@ -13,6 +13,8 @@ public class WebServer {
 	public static void main(String[] args) {
 		
 		WebServer webserver = new WebServer();
+		webserver.configuration = new HttpdConf("src/conf/httpd.conf");
+		webserver.mimeTypes = new MimeTypes("src/conf/mime.types");
 		webserver.start();
 	}
 	
@@ -25,12 +27,9 @@ public class WebServer {
 			ServerSocket socket = new ServerSocket(8080);
 			Socket client = null;
 
-			
-			Request ws = new Request();
-			
 			while( true ) {
 			      client = socket.accept();
-			      Worker worker = new Worker(client);
+			      Worker worker = new Worker(client, this.mimeTypes, this.configuration);
 			      Thread serverThread = new Thread(worker);
 			      serverThread.start();					
 			    }

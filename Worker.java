@@ -8,10 +8,10 @@ public class Worker implements Runnable {
 	private MimeTypes mimeTypes;
 	private HttpdConf configuration;
 	
-	Worker (Socket client){
+	Worker (Socket client, MimeTypes mimeTypes, HttpdConf configuration){
 		this.client = client;	
-		this.configuration = new HttpdConf("src/conf/httpd.conf");
-		this.mimeTypes = new MimeTypes("src/conf/mime.types");
+		this.configuration = configuration;
+		this.mimeTypes = mimeTypes;
 	}
 	
 	@Override
@@ -28,10 +28,9 @@ public class Worker implements Runnable {
 	      Response res; 
 	      res = responseFactory.getResponse(req , rsrc);
 	      
-	      
+	      res.send(client);
 	      
 	      log.write(req, res, this.client);
-	      res.send(client);
 	      client.close();
 		}
 		catch (IOException e) {
