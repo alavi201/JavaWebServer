@@ -5,249 +5,163 @@ import java.net.*;
 
 public class Request {
 
-	public String uri = "";
-	public String request_method = "";
-	private String http_version = "";
-	public String body = "";
-	public byte[] body_byte_array;
-	public String query_params;
-	public String requestLine = "";
-	public Map<String, String> request_headers;
-	public Map<String, String> config;
-	public Map<String, String> Alias;
-	public Map<String, String> ScriptAlias;
-	
-	
-		
-	public static int ParseRequestLine(String request_line, Request ws)
-	{
-		//String newline = System.getProperty("line.separator");
-		
-		int return_value = 1;
-		
-		try {
-			        
-	        if(request_line.isEmpty())
-	        	return_value = 0;
-	        
-	        System.out.println(request_line);
-	        
-	        ws.requestLine = request_line;
-	        
-	        String request_parts[] = request_line.split(" ");
-	        
-	        if(request_parts.length != 3)
-	        	return_value = 0;
-	        	//buffer.System.out.println("400");
-	        
-	        ws.request_method = request_parts[0];
-			ws.uri = request_parts[1];
-			ws.http_version = request_parts[2].substring(request_parts[2].indexOf("/") + 1, request_parts[2].length());
-			
-			if(ws.uri.contains("?")) {
-				ws.uri = ws.uri.substring(0, ws.uri.indexOf("?"));
-				String query_string = ws.uri.substring(ws.uri.indexOf("?") + 1, ws.uri.length());
-				ws.query_params = query_string;
-				
-				
-			}
-			
-			//System.out.println(URI);
-		} catch (Exception e) {
-	        e.printStackTrace();
-	    }
-		
-		return return_value;
-	}
-	
-	public static Map<String, String> ParseRequestHeaders(InputStream inputstream, Map<String, String> request_headers)
-	{
-		String readLine = "" ;
-		
-		try {
-			        
-			while ((readLine = readline(inputstream)) != null) {
-				System.out.println(readLine);
-				
-				if(readLine.equals(""))
-				{
-					break;
-				}
-				
-				String value = "";
-				String key = "";
-				//System.out.println("Done headers");
-				//else
-				//{
-				String header_parts[] = readLine.split(": ");
-				key = header_parts[0].toLowerCase();
-				
-				//System.out.println(key);
-				//System.out.println(header_parts[1]);
-				
-				if(key.equals("authorization")) {
-					//System.out.println(header_parts[1]);
-					String value_parts[] = header_parts[1].split(" ");
-					value = value_parts[1];
-					//System.out.println(value);
-				}
-				else
-					value = header_parts[1];
-				request_headers.put(key, value);
-				//}
-			}
-		} catch (Exception e) {
-	        e.printStackTrace();
-	    }
-		
-		return request_headers;
-		
-	}
-
-	protected void readRequest( Socket client, Request req ) throws IOException {
-	    String readLine;
-	    String response = "200";
-	    
-	    req.request_headers = new HashMap<String, String>();
-	    req.query_params = "";
-	    req.config =  new HashMap<String, String>();
-	    req.Alias =  new HashMap<String, String>();
-	    req.ScriptAlias =  new HashMap<String, String>();
-		
-		readHttpdConf(req);
-		
-		InputStream inputstream = client.getInputStream();
-		
-		//InputStreamReader isr = new InputStreamReader(inputstream);
-	    
-	    //BufferedReader buffer = new BufferedReader(isr );
-	    
-	    readLine = readline(inputstream);
-	    
-	    int valid_request = ParseRequestLine(readLine, req);
-
-	    if(valid_request == 1)
-	    {
-			req.request_headers = ParseRequestHeaders(inputstream, req.request_headers);
-				
-	    }
-	    
-	    if (req.request_headers.containsKey("content-length")) {
-			//req.body = buffer.readLine();
-	    	
-	    	int sizebytes = Integer.parseInt(req.request_headers.get("content-length"));
-	    	
-	    	System.out.println(sizebytes);
-	    	
-	    	this.body_byte_array = new byte[sizebytes];
-	    	
-	    	String bodyline = "";
-	    	
-	    	int bytes_read = inputstream.read(this.body_byte_array, 0, sizebytes);
-	    	
-	    	if(bytes_read < 0) {
-                System.out.println("Server: Tried to read from socket, read() returned < 0,  Closing socket.");
-                return;
+    public String uri = "";
+    public String requestMethod = "";
+    private String http_version = "";
+    public String body = "";
+    public byte[] bodyByteArray;
+    public String query_params;
+    public String requestLine = "";
+    public boolean isValid;
+    public Map<String, String> requestHeaders;
+    public Map<String, String> config;
+    public Map<String, String> Alias;
+    public Map<String, String> ScriptAlias;
+    
+    public static boolean ParseRequestLine(String requestLine, Request request)
+    {
+        request.isValid = true;
+        
+        try {
+                    
+            if(requestLine.isEmpty()) {
+                request.isValid = false;
             }
-	    	
-	    	//System.out.println("Body is "+ new String(this.body_byte_array, 0, bytes_read));
-	    	
-	    	req.body = new String(this.body_byte_array, 0, bytes_read);
-		}
-	    
-	}
-	
-	private static String readline(InputStream inputstream) {
-		
-		char character; 
-		String string = ""; 
-		char next;
-		
-		try {
-			do
-			{
-			   character = (char)inputstream.read(); 
-			   
-			   
-			   if(character == '\r') {
-				 
-				   next = (char)inputstream.read();
-				  
-				  if(next == '\n'){
-					  break; 
-				  }
-			   }
-			   else{
-				   string += character;
-			   }
-			}while(character != -1);
-			
-		} catch (Exception e) {
-	        e.printStackTrace();
-	    }
-		
-		return string;
-	}
-
-	protected void sendResponse( Socket client, String response ) throws IOException {
-	    PrintWriter out = new PrintWriter( client.getOutputStream(), true );
-	    //int gift = (int) Math.ceil( Math.random() * 100 );
-	    //String response = "404 Gee, thanks, this is for you: " + gift;
-
-	    out.println( response );
-
-	    System.out.println( "I sent: " + response );
-	  }
-
-	protected static void readHttpdConf(Request ws) {
-		HashMap config = new HashMap<String, String>();
-		HashMap ScriptAlias = new HashMap<String, String>();
-		HashMap Alias = new HashMap<String, String>();
-		
-		try {
-			
-            File httpd_file = new File("src/conf/httpd.conf");
-
-            BufferedReader buffer = new BufferedReader(new FileReader(httpd_file));
-
-            String line = "";
-
-            //System.out.println("Reading file using Buffered Reader");
-
-            while ((line = buffer.readLine()) != null) {
-            	if(! line.isEmpty() && line.charAt(0)!= '#' )
-            	{
-            		//System.out.println(line);
-            		
-            		String[] str = line.split(" ");
             
-            		String key = str[0];
-            		String value = str[1].replace("\"", "");
-             		
-            		if(key.equals("ScriptAlias")){
-                   
-                      key = str[1];
-                      value = str[2].replace("\"", "");
-                      ws.ScriptAlias.put(key, value);
-                      
-	                 }else if(key.equals("Alias")){
-	                      key = str[1];
-	                      value = str[2].replace("\"", "");
-	                      ws.Alias.put(key, value);
-	                 }else{
-	                	 ws.config.put(key, value);
-	                 }
-            	}
+            request.requestLine = requestLine;
+            
+            String requestParts[] = requestLine.split(" ");
+            
+            if(requestParts.length != 3) {
+                request.isValid = false;
             }
-		
-		} catch (IOException e) {
+            
+            request.requestMethod = requestParts[0];
+            request.uri = requestParts[1];
+            request.http_version = requestParts[2].substring(requestParts[2].indexOf("/") + 1, requestParts[2].length());
+            
+            if(request.uri.contains("?")) {
+                request.uri = request.uri.substring(0, request.uri.indexOf("?"));
+                String query_string = request.uri.substring(request.uri.indexOf("?") + 1, request.uri.length());
+                request.query_params = query_string;
+            }
+            
+        } catch (Exception e) {
             e.printStackTrace();
         }
-	}
+        
+        return request.isValid;
+    }
+    
+    public static Map<String, String> ParseRequestHeaders(InputStream inputstream, Map<String, String> requestHeaders)
+    {
+        String readLine = "" ;
+        
+        try {
+                    
+            while ((readLine = readline(inputstream)) != null) {
+                //System.out.println(readLine);
+                
+                if(readLine.equals(""))
+                {
+                    break;
+                }
+                
+                String value = "";
+                String key = "";
+                //System.out.println("Done headers");
+                //else
+                //{
+                String header_parts[] = readLine.split(": ");
+                key = header_parts[0].toLowerCase();
+                
+                //System.out.println(key);
+                //System.out.println(header_parts[1]);
+                
+                if(key.equals("authorization")) {
+                    //System.out.println(header_parts[1]);
+                    String value_parts[] = header_parts[1].split(" ");
+                    value = value_parts[1];
+                    //System.out.println(value);
+                }
+                else
+                    value = header_parts[1];
+                requestHeaders.put(key, value);
+                //}
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        
+        return requestHeaders;
+        
+    }
 
-	protected static void Print(String string){
-		System.out.println(string);
-	}
+    protected void readRequest( Socket client, Request request ) throws IOException {
+        String readLine;
+        String response = "200";
+        
+        request.requestHeaders = new HashMap<String, String>();
+        request.query_params = "";
+        request.config =  new HashMap<String, String>();
+        request.Alias =  new HashMap<String, String>();
+        request.ScriptAlias =  new HashMap<String, String>();
+        
+        InputStream inputstream = client.getInputStream();
+        
+        //InputStreamReader isr = new InputStreamReader(inputstream);
+        
+        //BufferedReader buffer = new BufferedReader(isr );
+        
+        readLine = readline(inputstream);
+        
+        ParseRequestLine(readLine, request);
 
-		
+        if(request.isValid)
+        {
+            request.requestHeaders = ParseRequestHeaders(inputstream, request.requestHeaders);
+                
+        }
+        
+        if (request.requestHeaders.containsKey("content-length")) {
+            
+            int sizebytes = Integer.parseInt(request.requestHeaders.get("content-length"));
+            
+            this.bodyByteArray = new byte[sizebytes];
+            
+            int bytes_read = inputstream.read(this.bodyByteArray, 0, sizebytes);
+            
+            request.body = new String(this.bodyByteArray, 0, bytes_read);
+        }
+    }
+    
+    private static String readline(InputStream inputstream) {
+        
+        char character; 
+        String string = ""; 
+        char next;
+        
+        try {
+            do {
+               character = (char)inputstream.read(); 
+               
+               if(character == '\r') {
+                 
+                  next = (char)inputstream.read();
+                  
+                  if(next == '\n'){
+                      break; 
+                  }
+               }
+               else{
+                   string += character;
+               }
+            } while(character != -1);
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        
+        return string;
+    }
 }

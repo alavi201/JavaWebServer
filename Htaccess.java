@@ -34,29 +34,27 @@ public class Htaccess extends ConfigurationReader {
 
     public void load() throws IOException {
         
-    	try {						
-			while (this.hasMoreLines()) {
-	          	
-            	String Line = this.nextLine();
-            	
-            	//System.out.println(Line);
-            	
-            	if(! Line.isEmpty() && Line.charAt(0)!= '#' ){	
-            		String key = "";
-            		String value = "";
-            	
-            		 String[] str = Line.split(" ");
+        try {                        
+            while (this.hasMoreLines()) {
+                  
+                String Line = this.nextLine();
+                
+                if(! Line.isEmpty() && Line.charAt(0)!= '#' ){    
+                    String key = "";
+                    String value = "";
+                
+                    String[] str = Line.split(" ");
                      
-            		 key = str[0];
-                     value = str[1];
+                    key = str[0];
+                    value = str[1];
                      
-                     if(key.equals("AuthName")) {
-                    	 value = Line.substring(key.length()+1);
-                     }
+                    if(key.equals("AuthName")) {
+                         value = Line.substring(key.length()+1);
+                    }
                      
-                     this.config.put(key, value.replace("\"", ""));
-            	}
-			}
+                    this.config.put(key, value.replace("\"", ""));
+                }
+          }
         } catch (FileNotFoundException ex) {
             ex.getMessage();
         }
