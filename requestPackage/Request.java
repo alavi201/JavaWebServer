@@ -61,44 +61,37 @@ public class Request {
         try {
                     
             while ((readLine = readline(inputstream)) != null) {
-                //System.out.println(readLine);
                 
-                if(readLine.equals(""))
-                {
+                if(readLine.equals("")) {
                     break;
                 }
                 
                 String value = "";
                 String key = "";
-                //System.out.println("Done headers");
-                //else
-                //{
+                
                 String header_parts[] = readLine.split(": ");
                 key = header_parts[0].toLowerCase();
                 
-                //System.out.println(key);
-                //System.out.println(header_parts[1]);
-                
                 if(key.equals("authorization")) {
-                    //System.out.println(header_parts[1]);
+                    
                     String value_parts[] = header_parts[1].split(" ");
                     value = value_parts[1];
-                    //System.out.println(value);
                 }
-                else
+                else {
                     value = header_parts[1];
+                }
+                
                 requestHeaders.put(key, value);
-                //}
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
         
         return requestHeaders;
-        
     }
 
     public void readRequest( Socket client, Request request ) throws IOException {
+        
         String readLine;
         String response = "200";
         
@@ -110,10 +103,6 @@ public class Request {
         
         InputStream inputstream = client.getInputStream();
         
-        //InputStreamReader isr = new InputStreamReader(inputstream);
-        
-        //BufferedReader buffer = new BufferedReader(isr );
-        
         readLine = readline(inputstream);
         
         ParseRequestLine(readLine, request);
@@ -121,7 +110,6 @@ public class Request {
         if(request.isValid)
         {
             request.requestHeaders = ParseRequestHeaders(inputstream, request.requestHeaders);
-                
         }
         
         if (request.requestHeaders.containsKey("content-length")) {
