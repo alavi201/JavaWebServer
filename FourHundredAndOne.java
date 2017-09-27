@@ -20,7 +20,7 @@ public class FourHundredAndOne extends Response{
         PrintWriter out = new PrintWriter( client.getOutputStream(), true );
         OutputStream socketOutputStream = client.getOutputStream();
         
-        this.responseHeaders.put("WWW-Authenticate","Basic realm=\"HELLO WORLD\"");
+        this.responseHeaders.put("WWW-Authenticate","Basic realm=\" "+this.resource.realm+" \" ");
             
         socketOutputStream.write((getResponseline() + getHeaders()+"\r\n").getBytes());
     }

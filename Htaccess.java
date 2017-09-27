@@ -51,7 +51,7 @@ public class Htaccess extends ConfigurationReader {
                     if(key.equals("AuthName")) {
                          value = Line.substring(key.length()+1);
                     }
-                     
+                    
                     this.config.put(key, value.replace("\"", ""));
                 }
           }

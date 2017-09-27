@@ -9,6 +9,9 @@ public class Resource {
     public String resourceName = "";
     public String pathWithoutDocRoot = "";
     public String extension = "";
+    private boolean isProtected = false;
+    public String accessFile = "";
+    public String realm = "";
     
     Resource(String uri, HttpdConf config ){
         
@@ -18,6 +21,9 @@ public class Resource {
         String absolute_path = "";
         String pathWithoutDocRoot = "";
         String checkAlias = "";
+        String accessFile = (String) config.getConfig().get("AccessFileName");
+        String directoryPath = "";
+        boolean htaccessExists;
         
         resource_name = uri.substring(uri.lastIndexOf("/") + 1);
         
@@ -43,8 +49,9 @@ public class Resource {
         
         this.pathWithoutDocRoot = absolute_path;
         
-        File file = new File(absolute_path);
+        directoryPath = absolute_path;
         
+        File file = new File(absolute_path);
         
         if(!file.isFile()) {
             absolute_path = absolute_path + config.getConfig().get("DirectoryIndex");
@@ -53,6 +60,26 @@ public class Resource {
         this.absolutepath = absolute_path.replace("//","/");
         
         this.extension = file.getName().substring(file.getName().lastIndexOf(".") + 1);
+        
+        htaccessExists = new File(directoryPath, accessFile).exists();
+        
+        if(htaccessExists) {
+        	
+        	Htaccess htaccess;
+			
+        	try {
+        		
+				this.isProtected = true;
+	        	this.accessFile = (String) config.getConfig().get("AccessFileName");
+	        	htaccess = new Htaccess(directoryPath+File.separator+this.accessFile);
+	        	this.realm = (String) htaccess.config.get("AuthName");
+	        	
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}        	
+        }
+        
     }
     
     public String absolutePath() {
@@ -64,6 +91,6 @@ public class Resource {
     }
     
     public boolean isProtected() {
-        return false;
+        return this.isProtected;
     }
 }

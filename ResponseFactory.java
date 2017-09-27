@@ -23,9 +23,6 @@ public class ResponseFactory{
         String absolpath = resource.absolutePath();
         File file = new File(absolpath);
         String directoryPath = file.getAbsoluteFile().getParentFile().getAbsolutePath();
-        String accessFile = (String) httpd.getConfig().get("AccessFileName");
-        
-        boolean htaccessExists = new File(directoryPath, accessFile).exists();
         
         if(!request.isValid) {
             
@@ -36,10 +33,10 @@ public class ResponseFactory{
         // in case of any exceptions, return a 500 response
         Response response = new FiveHundred(resource);    
         
-        if(htaccessExists) {
+        if(resource.isProtected()) {
             try {
                 
-                Htaccess htaccess = new Htaccess(directoryPath+File.separator+accessFile);
+                Htaccess htaccess = new Htaccess(directoryPath+File.separator+resource.accessFile);
                 
                 Htpassword htpassword = new Htpassword(htaccess.config.get("AuthUserFile"));
                 
