@@ -9,7 +9,7 @@ import java.io.*;
 
 public class Htpassword extends ConfigurationReader {
     
-	private Map<String, String> users;
+    private Map<String, String> users;
 
     public Htpassword( String filename ) throws IOException {
         super( filename );
@@ -45,10 +45,10 @@ public class Htpassword extends ConfigurationReader {
   
     public void load() throws IOException {
         
-    	try {                        
+        try {                        
             while (this.hasMoreLines()) {
                 
-            	String Line = this.nextLine();
+                String Line = this.nextLine();
                   
                 if(! Line.isEmpty() && Line.charAt(0)!= '#' ){    
                     String key = "";
@@ -70,14 +70,14 @@ public class Htpassword extends ConfigurationReader {
     // Encrypt the cleartext password (that was decoded from the Base64 String
     // provided by the client) using the SHA-1 encryption algorithm
         try {
-        	
+            
             MessageDigest mDigest = MessageDigest.getInstance( "SHA-1" );
             byte[] result = mDigest.digest( password.getBytes() );
      
             return Base64.getEncoder().encodeToString( result );
         } catch( Exception e ) {
       
-    	    return "";
+            return "";
         }
     }
   

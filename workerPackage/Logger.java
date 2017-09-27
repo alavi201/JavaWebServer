@@ -32,18 +32,18 @@ public class Logger {
     
     public void write(Request request, Response response, Socket client){
         
-    	try{
+        try{
             
-    		String username = "";
+            String username = "";
             String logLine = "";
             
             logLine += client.getInetAddress().toString()+" ";
             
             if(request.requestHeaders.containsKey("authorization")) {
-            	username = getUsername(request.requestHeaders.get("authorization"));
+                username = getUsername(request.requestHeaders.get("authorization"));
             }
             else {    
-            	username = "-";        
+                username = "-";        
             }
             
             logLine += username+" ";
@@ -57,9 +57,9 @@ public class Logger {
             logLine += response.code+" ";
             
             if(response.responseHeaders.containsKey("Content-Length")) {
-            	logLine += response.responseHeaders.get("Content-Length");
+                logLine += response.responseHeaders.get("Content-Length");
             } else {
-            	logLine += "-";
+                logLine += "-";
             }
             
             BufferedWriter output = new BufferedWriter(new FileWriter(this.file.getAbsolutePath(), true));
@@ -72,8 +72,7 @@ public class Logger {
             output.close();
             
         } catch (IOException e) {
-            //response.send();
-           // do something
+        	e.printStackTrace();
         } 
     }
     

@@ -26,7 +26,7 @@ public class Worker implements Runnable {
     @Override
     public void run() {
         
-    	ResponseFactory responseFactory = new ResponseFactory();
+        ResponseFactory responseFactory = new ResponseFactory();
         Request request = new Request();
 
         Logger log = new Logger((String) this.configuration.getConfig().get("LogFile"));

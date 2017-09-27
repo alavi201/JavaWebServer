@@ -14,7 +14,7 @@ public abstract class Response {
     
     protected String getHeaders() {
         
-    	String headers = "";
+        String headers = "";
         
         for (Map.Entry<String, String> header : this.responseHeaders.entrySet()) {
             headers += header.getKey()+": "+header.getValue()+"\r\n";
@@ -24,7 +24,7 @@ public abstract class Response {
     }
     
     protected String getResponseline() {
-    	
+        
         String responseLine = "";
         responseLine += "HTTP/1.1 "+this.code+" "+this.reasonPhrase+"\r\n";
         return responseLine;
@@ -32,7 +32,7 @@ public abstract class Response {
     
     public Response(Resource resource){
         
-    	this.responseHeaders = new HashMap<String, String>();
+        this.responseHeaders = new HashMap<String, String>();
         this.resource = resource;
         String timeStamp = "";
         

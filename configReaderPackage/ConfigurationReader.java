@@ -13,7 +13,7 @@ import java.util.*;
 import java.io.*;
 import java.util.Set;
 
-public class ConfigurationReader{
+public abstract class ConfigurationReader{
       
       static String filename = "";
       private static BufferedReader bufferreader = null;
@@ -21,10 +21,10 @@ public class ConfigurationReader{
       
       public ConfigurationReader(String fileName){
            
-    	  this.filename = fileName;
+          this.filename = fileName;
            
           try {
-        	   bufferreader = new BufferedReader(new FileReader(this.filename));
+               bufferreader = new BufferedReader(new FileReader(this.filename));
           }catch (FileNotFoundException ex) {
                ex.getMessage();
           }

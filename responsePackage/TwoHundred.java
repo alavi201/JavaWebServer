@@ -22,11 +22,11 @@ public class TwoHundred extends Response{
         OutputStream socketOutputStream = client.getOutputStream();
         
         if(this.resource.isScript()) {    
-        	socketOutputStream.write((getResponseline()+this.resource.output).getBytes());
+            socketOutputStream.write((getResponseline()+this.resource.output).getBytes());
         
         } else {
             
-        	File file = new File(this.resource.absolutePath());
+            File file = new File(this.resource.absolutePath());
             
             this.responseHeaders.put("Content-Type", resource.extension);
             this.responseHeaders.put("Content-Length", Long.toString(file.length()) );

@@ -32,7 +32,7 @@ public class ResponseFactory{
         
         if(!request.isValid) {
             
-        	Response response = new FourHundred(resource);
+            Response response = new FourHundred(resource);
             return response;
         }
         
@@ -48,7 +48,7 @@ public class ResponseFactory{
                 
                 if(request.requestHeaders.containsKey("authorization")){
                     
-                	String authToken = request.requestHeaders.get("authorization");
+                    String authToken = request.requestHeaders.get("authorization");
                    
                     boolean isAuthorized = htpassword.isAuthorized(authToken);
                     
@@ -63,15 +63,15 @@ public class ResponseFactory{
                 
                 }
             } catch (IOException e1) {
-            	return response;
+                return response;
             }
         }
         
         if(!file.exists()) {
             
-        	if(request.requestMethod.equals("PUT")) {
+            if(request.requestMethod.equals("PUT")) {
                 
-        		try{
+                try{
                        File newFile = new File(resource.pathWithoutDocRoot);
                        newFile.getParentFile().mkdir();
                        newFile.createNewFile();
@@ -87,21 +87,21 @@ public class ResponseFactory{
                        response = new TwoHundredAndOne(resource);
                        
                } catch (IOException e) {
-            	   return response;
+                   return response;
                } 
                         
            } else {
                response = new FourHundredAndFour(resource);
                return response;
            }
-        	
+            
        } else {
            
-    	   String processOutputLine = "";
+           String processOutputLine = "";
                 
            if(resource.isScript()) {
                
-        	   File script = new File(resource.absolutePath());
+               File script = new File(resource.absolutePath());
     
                String[] scriptPath = new String[0];
                     
@@ -126,7 +126,6 @@ public class ResponseFactory{
                         
                    environmentVariables.put("SERVER_PROTOCOL", "HTTP");
                         
-                        
                    for (Map.Entry<String, String> header : request.requestHeaders.entrySet()) {
                        environmentVariables.put("HTTP_"+header.getKey(), header.getValue());
                    }
@@ -146,7 +145,7 @@ public class ResponseFactory{
                    BufferedReader bufferreader = new BufferedReader(new InputStreamReader(process.getInputStream()));
                         
                    while ((processOutputLine = bufferreader.readLine()) != null) {
-                	   stringbuilder.append(processOutputLine);
+                       stringbuilder.append(processOutputLine);
                        stringbuilder.append(System.getProperty("line.separator"));
                    }
                         
@@ -183,7 +182,7 @@ public class ResponseFactory{
                                 }
                                     
                             } catch (ParseException e) {
-                            	response = new FiveHundred(resource);
+                                response = new FiveHundred(resource);
                             }      
                         }
                         
@@ -191,9 +190,9 @@ public class ResponseFactory{
                     
                     case "POST":
                         
-                    	response = new TwoHundred(resource);
+                        response = new TwoHundred(resource);
                         
-                    	break;
+                        break;
                     
                     case "HEAD":
                             
@@ -205,7 +204,7 @@ public class ResponseFactory{
                    
                     case "PUT":
                         
-                    	try{
+                        try{
                             FileOutputStream stream = new FileOutputStream(resource.absolutePath());
                                 try {
                                     stream.write(request.bodyByteArray);
@@ -223,7 +222,7 @@ public class ResponseFactory{
                         
                     case "DELETE":
                         
-                    	if(file.delete()){
+                        if(file.delete()){
                             response = new TwoHundredAndFour(resource);
                             
                         }else{

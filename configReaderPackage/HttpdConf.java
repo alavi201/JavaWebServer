@@ -64,10 +64,12 @@ public class HttpdConf extends ConfigurationReader {
                       
                    } else if(key.equals("Alias")) {
                         
-                	   key = str[1];
+                       key = str[1];
                        value = str[2];
                        this.aliases.put(key, value.replace("\"", ""));
+                   
                    } else{
+                  
                        this.config.put(key, value.replace("\"", ""));
                    }
                }

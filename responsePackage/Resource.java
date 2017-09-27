@@ -32,7 +32,6 @@ public class Resource {
         
         this.resourceName = resource_name;
         
-        
         if(second != -1) {
             checkAlias = uri.substring(first, second +1);
         }
@@ -67,20 +66,20 @@ public class Resource {
         htaccessExists = new File(directoryPath, accessFile).exists();
         
         if(htaccessExists) {
-        	
-        	Htaccess htaccess;
-			
-        	try {
-        		
-				this.isProtected = true;
-	        	this.accessFile = (String) config.getConfig().get("AccessFileName");
-	        	htaccess = new Htaccess(directoryPath+File.separator+this.accessFile);
-	        	this.realm = (String) htaccess.getConfig().get("AuthName");
-	        	
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}        	
+            
+            Htaccess htaccess;
+            
+            try {
+                
+                this.isProtected = true;
+                this.accessFile = (String) config.getConfig().get("AccessFileName");
+                htaccess = new Htaccess(directoryPath+File.separator+this.accessFile);
+                this.realm = (String) htaccess.getConfig().get("AuthName");
+                
+            } catch (IOException e) {
+                
+                e.printStackTrace();
+            }            
         }
         
     }
