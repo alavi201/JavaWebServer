@@ -1,5 +1,10 @@
+package workerPackage;
 import java.util.*;
 import java.util.logging.Level;
+
+import requestPackage.Request;
+import responsePackage.Response;
+
 import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.text.SimpleDateFormat;

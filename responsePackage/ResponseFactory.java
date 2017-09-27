@@ -1,3 +1,9 @@
+package responsePackage;
+import configReaderPackage.HttpdConf;
+import requestPackage.Request;
+import configReaderPackage.Htaccess;
+import configReaderPackage.Htpassword;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -38,7 +44,7 @@ public class ResponseFactory{
                 
                 Htaccess htaccess = new Htaccess(directoryPath+File.separator+resource.accessFile);
                 
-                Htpassword htpassword = new Htpassword(htaccess.config.get("AuthUserFile"));
+                Htpassword htpassword = new Htpassword(htaccess.getConfig().get("AuthUserFile"));
                 
                 if(request.requestHeaders.containsKey("authorization")){
                     

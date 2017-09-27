@@ -1,3 +1,4 @@
+package configReaderPackage;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -9,7 +10,7 @@ public class MimeTypes extends ConfigurationReader {
 
     private static Map<String, String> types;
 
-    MimeTypes(String filename){
+    public MimeTypes(String filename){
         super(filename);
         types = new HashMap<String, String>();
         this.load();

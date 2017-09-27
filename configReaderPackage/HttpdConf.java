@@ -1,3 +1,4 @@
+package configReaderPackage;
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -17,7 +18,7 @@ public class HttpdConf extends ConfigurationReader {
     private static Map<String, String> aliases;
     private static Map<String, String> scriptaliases;
     
-    HttpdConf (String filename){
+    public HttpdConf (String filename){
         super(filename);
         config = new HashMap<String, String>();
         aliases = new HashMap<String, String>();

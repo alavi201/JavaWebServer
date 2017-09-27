@@ -1,3 +1,4 @@
+package responsePackage;
 import java.io.*;
 import java.net.Socket;
 import java.util.*;
@@ -44,7 +45,7 @@ public abstract class Response {
         this.responseHeaders.put("Connection", "Closed");
     }
     
-    protected void send( Socket client) throws IOException {
+    public void send( Socket client) throws IOException {
         OutputStream socketOutputStream = client.getOutputStream();
         socketOutputStream.write((getResponseline() + getHeaders()+"\r\n").getBytes());
       }

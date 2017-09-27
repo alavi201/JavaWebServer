@@ -1,3 +1,4 @@
+package responsePackage;
 
 public class FiveHundred extends Response{
 

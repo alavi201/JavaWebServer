@@ -1,3 +1,6 @@
+package responsePackage;
+import configReaderPackage.HttpdConf;
+import configReaderPackage.Htaccess;
 import java.io.*;
 import java.util.*;
 
@@ -13,7 +16,7 @@ public class Resource {
     public String accessFile = "";
     public String realm = "";
     
-    Resource(String uri, HttpdConf config ){
+    public Resource(String uri, HttpdConf config ){
         
         int first = uri.indexOf("/");
         int second = uri.indexOf("/", first + 1);
@@ -72,7 +75,7 @@ public class Resource {
 				this.isProtected = true;
 	        	this.accessFile = (String) config.getConfig().get("AccessFileName");
 	        	htaccess = new Htaccess(directoryPath+File.separator+this.accessFile);
-	        	this.realm = (String) htaccess.config.get("AuthName");
+	        	this.realm = (String) htaccess.getConfig().get("AuthName");
 	        	
 			} catch (IOException e) {
 				// TODO Auto-generated catch block

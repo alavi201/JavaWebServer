@@ -1,5 +1,14 @@
+package workerPackage;
 import java.io.*;
 import java.util.*;
+
+import configReaderPackage.HttpdConf;
+import configReaderPackage.MimeTypes;
+import requestPackage.Request;
+import responsePackage.Resource;
+import responsePackage.Response;
+import responsePackage.ResponseFactory;
+
 import java.net.*;
 
 public class Worker implements Runnable {
@@ -8,7 +17,7 @@ public class Worker implements Runnable {
     private MimeTypes mimeTypes;
     private HttpdConf configuration;
 
-    Worker(Socket client, MimeTypes mimeTypes, HttpdConf configuration) {
+    public Worker(Socket client, MimeTypes mimeTypes, HttpdConf configuration) {
         this.client = client;
         this.configuration = configuration;
         this.mimeTypes = mimeTypes;

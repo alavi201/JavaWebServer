@@ -1,3 +1,4 @@
+package configReaderPackage;
 
 import java.util.*;
 import java.util.logging.Level;

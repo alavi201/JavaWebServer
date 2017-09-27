@@ -1,3 +1,4 @@
+package requestPackage;
 import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
@@ -97,7 +98,7 @@ public class Request {
         
     }
 
-    protected void readRequest( Socket client, Request request ) throws IOException {
+    public void readRequest( Socket client, Request request ) throws IOException {
         String readLine;
         String response = "200";
         

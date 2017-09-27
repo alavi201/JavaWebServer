@@ -1,3 +1,4 @@
+package configReaderPackage;
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -23,12 +24,12 @@ public class Htaccess extends ConfigurationReader {
 
     private String fname = "";
     private static BufferedReader bf = null;
-    Map<String, String> config = null;
+    private Map<String, String> config = null;
 
     public Htaccess(String filename) throws IOException {
         super(filename);
         this.fname = filename;
-        this.config = new HashMap<String, String>();
+        this.setConfig(new HashMap<String, String>());
         this.load();
     }
 
@@ -52,7 +53,7 @@ public class Htaccess extends ConfigurationReader {
                          value = Line.substring(key.length()+1);
                     }
                     
-                    this.config.put(key, value.replace("\"", ""));
+                    this.getConfig().put(key, value.replace("\"", ""));
                 }
           }
         } catch (FileNotFoundException ex) {
@@ -108,8 +109,16 @@ public class Htaccess extends ConfigurationReader {
         Htaccess ht = new Htaccess("src/conf/_.htaccess");
 
 
-        for( String key : ht.config.keySet()){
-            System.out.println(key + ": " + ht.config.get(key));
+        for( String key : ht.getConfig().keySet()){
+            System.out.println(key + ": " + ht.getConfig().get(key));
         }
     }
+
+	public Map<String, String> getConfig() {
+		return config;
+	}
+
+	public void setConfig(Map<String, String> config) {
+		this.config = config;
+	}
 }

@@ -1,5 +1,10 @@
 import java.io.*;
 import java.util.*;
+
+import configReaderPackage.HttpdConf;
+import configReaderPackage.MimeTypes;
+import workerPackage.Worker;
+
 import java.net.*;
 
 public class WebServer {
